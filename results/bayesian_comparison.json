@@ -1,0 +1,34 @@
+{
+  "untuned": {
+    "model_name": "Random Forest (Default)",
+    "config": "n_estimators=100, max_depth=12, class_weight='balanced', n_jobs=-1",
+    "cv_macro_f1": 0.8734,
+    "top1_accuracy": 0.8103,
+    "student_test_macro_f1": 0.8783,
+    "log_loss": 0.1376,
+    "route_continuity": 0.2571,
+    "inference_time_ms_1k": 2.58
+  },
+  "tuned": {
+    "model_name": "Random Forest (Bayesian Tuned)",
+    "config": "{'n_estimators': 100, 'max_depth': 18, 'min_samples_split': 3, 'min_samples_leaf': 2, 'max_features': 'sqrt'}",
+    "cv_macro_f1": 0.8953,
+    "top1_accuracy": 0.8079,
+    "student_test_macro_f1": 0.8146,
+    "log_loss": 0.1344,
+    "route_continuity": 0.2583,
+    "inference_time_ms_1k": 1.72,
+    "precision": 0.8837,
+    "recall": 0.5271,
+    "roc_auc": 0.9767
+  },
+  "search_space": {
+    "n_estimators": "[40, 120]",
+    "max_depth": "[8, 18]",
+    "min_samples_split": "[2, 8]",
+    "min_samples_leaf": "[1, 4]",
+    "max_features": "['sqrt', 'log2', 0.7]"
+  },
+  "total_trials": 15,
+  "optimization_time_sec": 122.17
+}

@@ -1,0 +1,16 @@
+{
+  "train_trips_count": 80,
+  "test_trips_count": 10,
+  "total_gps_observations": 227577,
+  "train_gps_observations": 208417,
+  "test_gps_observations": 19160,
+  "avg_gps_per_trip": 2528.6,
+  "min_gps_per_trip": 262,
+  "max_gps_per_trip": 19313,
+  "avg_route_arcs": 386.8,
+  "avg_network_nodes": 22490.8,
+  "avg_network_arcs": 45132.7,
+  "pct_exact_1s_intervals": 94.32,
+  "total_missing_values": 0,
+  "trips_with_large_gaps": 47
+}

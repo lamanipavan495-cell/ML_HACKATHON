@@ -1,0 +1,163 @@
+{
+  "models": [
+    {
+      "Model": "Logistic Regression",
+      "Algorithm Family": "Linear and Probabilistic",
+      "Key Configuration": "L2 penalty, class_weight='balanced', C=1.0, max_iter=500",
+      "CV Macro F1-score": 0.7889,
+      "Top-1 Accuracy": 0.7904,
+      "Route continuity": 0.2482,
+      "Student-Test Macro F1-score": 0.7913,
+      "Precision": 0.4932,
+      "Recall": 0.9376,
+      "Log Loss": 0.2211,
+      "ROC-AUC": 0.9731,
+      "Training Time (s)": 0.84,
+      "Inference Time (ms/1k)": 0.26
+    },
+    {
+      "Model": "K-Nearest Neighbors",
+      "Algorithm Family": "Instance-based",
+      "Key Configuration": "k=7, weights='distance', metric='euclidean'",
+      "CV Macro F1-score": 0.8695,
+      "Top-1 Accuracy": 0.7942,
+      "Route continuity": 0.2565,
+      "Student-Test Macro F1-score": 0.8755,
+      "Precision": 0.7838,
+      "Recall": 0.7703,
+      "Log Loss": 0.2522,
+      "ROC-AUC": 0.9435,
+      "Training Time (s)": 1.03,
+      "Inference Time (ms/1k)": 140.7
+    },
+    {
+      "Model": "Random Forest",
+      "Algorithm Family": "Ensemble (Bagging)",
+      "Key Configuration": "n_estimators=100, max_depth=12, class_weight='balanced', n_jobs=-1",
+      "CV Macro F1-score": 0.8734,
+      "Top-1 Accuracy": 0.8103,
+      "Route continuity": 0.2571,
+      "Student-Test Macro F1-score": 0.8783,
+      "Precision": 0.7054,
+      "Recall": 0.8859,
+      "Log Loss": 0.1376,
+      "ROC-AUC": 0.9815,
+      "Training Time (s)": 11.45,
+      "Inference Time (ms/1k)": 2.58
+    },
+    {
+      "Model": "HistGradientBoosting",
+      "Algorithm Family": "Boosting (Tree-based)",
+      "Key Configuration": "max_iter=100, learning_rate=0.1, max_depth=8, class_weight='balanced'",
+      "CV Macro F1-score": 0.8509,
+      "Top-1 Accuracy": 0.8086,
+      "Route continuity": 0.2576,
+      "Student-Test Macro F1-score": 0.8656,
+      "Precision": 0.6613,
+      "Recall": 0.9064,
+      "Log Loss": 0.1561,
+      "ROC-AUC": 0.9816,
+      "Training Time (s)": 1.3,
+      "Inference Time (ms/1k)": 2.93
+    },
+    {
+      "Model": "Multi-Layer Perceptron",
+      "Algorithm Family": "Neural Networks",
+      "Key Configuration": "Hidden layers=(64, 32), ReLU, early_stopping=True, max_iter=30",
+      "CV Macro F1-score": 0.8815,
+      "Top-1 Accuracy": 0.8079,
+      "Route continuity": 0.2545,
+      "Student-Test Macro F1-score": 0.8808,
+      "Precision": 0.8033,
+      "Recall": 0.7699,
+      "Log Loss": 0.1105,
+      "ROC-AUC": 0.9797,
+      "Training Time (s)": 36.07,
+      "Inference Time (ms/1k)": 1.05
+    }
+  ],
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        144129,
+        18428
+      ],
+      [
+        1193,
+        17936
+      ]
+    ],
+    "K-Nearest Neighbors": [
+      [
+        158492,
+        4065
+      ],
+      [
+        4394,
+        14735
+      ]
+    ],
+    "Random Forest": [
+      [
+        155480,
+        7077
+      ],
+      [
+        2182,
+        16947
+      ]
+    ],
+    "HistGradientBoosting": [
+      [
+        153678,
+        8879
+      ],
+      [
+        1790,
+        17339
+      ]
+    ],
+    "Multi-Layer Perceptron": [
+      [
+        158951,
+        3606
+      ],
+      [
+        4402,
+        14727
+      ]
+    ]
+  },
+  "mlp_loss_curve": [
+    0.17804258859617308,
+    0.11228594711110394,
+    0.10778032555045558,
+    0.10557758343408521,
+    0.1041390182226769,
+    0.10291410463484857,
+    0.101810292636895,
+    0.10129413150475905,
+    0.10057276169795971,
+    0.0996472741098372,
+    0.09936203477220477,
+    0.09897018036182975,
+    0.09870276407158612,
+    0.09799065519102572,
+    0.09756331842977012,
+    0.09745434724092542,
+    0.09717129328330984,
+    0.09658680801363846,
+    0.09686717303952554,
+    0.09635799086437286,
+    0.09609898498504667,
+    0.09612133003601873,
+    0.09567161282986167,
+    0.0951399504501498,
+    0.09527561455111626,
+    0.09513600978516626,
+    0.094950538378892,
+    0.0948162355124447,
+    0.09491351282290292,
+    0.09470760263694518
+  ]
+}

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathSnap – Evaluator Dashboard (Laptop 2)</title>
+  <style>
+    :root {
+      --primary: #1976d2;
+      --primary-dark: #0d47a1;
+      --success: #2e7d32;
+      --purple: #7b1fa2;
+      --dark: #212121;
+      --light-bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --border: #e0e0e0;
+      --text: #333333;
+      --text-muted: #666666;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--light-bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+    .badge {
+      background: #37474f;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .badge.laptop2 { background: #00796b; color: white; }
+    .api-config {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .api-config input {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background: #2a2a2a;
+      color: white;
+      font-family: monospace;
+      font-size: 12px;
+      width: 220px;
+    }
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    aside {
+      width: 380px;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+      gap: 18px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    select, button {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+    select { background: white; cursor: pointer; }
+    button.btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    button.btn-primary:hover { background: var(--primary-dark); }
+    button.btn-primary:disabled { background: #9e9e9e; cursor: not-allowed; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--light-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .stat-value { font-size: 20px; font-weight: 700; color: var(--dark); }
+    .stat-value.success { color: var(--success); }
+    .stat-value.purple { color: var(--purple); }
+
+    .timing-card {
+      background: #fafafa;
+      border-left: 3px solid var(--primary);
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 0 4px 4px 0;
+    }
+    .timing-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+
+    .terminal-container {
+      background: #1e1e1e;
+      color: #76ff03;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 11px;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .map-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #e5e5e5;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .map-overlay-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #666;
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      width: 92vw;
+      max-width: 1250px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .modal-header {
+      padding: 14px 20px;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .modal-header h2 { font-size: 17px; color: #f8fafc; font-weight: 700; margin: 0; }
+    .close-btn {
+      background: none; border: none; color: #94a3b8; font-size: 20px; font-weight: bold; cursor: pointer;
+    }
+    .close-btn:hover { color: #ef4444; }
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .nav-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background: #334155; color: white; }
+    .nav-btn.active {
+      background: #2563eb;
+      color: white;
+      border-color: #3b82f6;
+    }
+    .benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 8px 12px;
+      border: 1px solid #334155;
+      text-align: left;
+    }
+    .benchmark-table th {
+      background: #1e293b;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+    .benchmark-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .plot-display-container {
+      text-align: center;
+      background: #1e293b;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+    .plot-display-container img {
+      max-width: 100%;
+      max-height: 520px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>PathSnap Evaluator Interface</h1>
+      <span class="badge laptop2">Laptop 2 – Client</span>
+      <span class="badge" id="deviceBadge" style="background:#0284c7;" title="Maximum 3 devices permitted simultaneously">Devices: 1/3 Active</span>
+      <span class="badge">UE24CS352A ML Hackathon</span>
+    </div>
+    <div class="api-config">
+      <span>API Endpoint (Laptop 1):</span>
+      <input type="text" id="apiEndpoint" value="" placeholder="http://192.168.x.x:8000" />
+      <button onclick="pingApi()" style="padding: 6px 12px; font-size: 12px; cursor: pointer;">Ping</button>
+      <button onclick="openModal()" style="background:#7c3aed; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; margin-left:8px;">📊 Model Comparison</button>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <div>
+        <div class="section-title">Trip Selection</div>
+        <div class="form-group">
+          <label for="partitionSelect">Evaluation Partition</label>
+          <select id="partitionSelect" onchange="fetchTrips()">
+            <option value="student_test">Student Testing (10 trips)</option>
+            <option value="evaluator_test">Evaluator Testing (10 unseen trips)</option>
+            <option value="train">Training (80 trips)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+          <label for="tripSelect">Select Trip ID</label>
+          <select id="tripSelect">
+            <option value="00000000">Trip 00000000</option>
+            <option value="00000007">Trip 00000007</option>
+            <option value="00000009">Trip 00000009</option>
+            <option value="00000040">Trip 00000040</option>
+            <option value="00000052">Trip 00000052</option>
+            <option value="00000056">Trip 00000056</option>
+            <option value="00000065">Trip 00000065</option>
+            <option value="00000076">Trip 00000076</option>
+            <option value="00000077">Trip 00000077</option>
+            <option value="00000091">Trip 00000091</option>
+          </select>
+        </div>
+        <button id="runBtn" class="btn-primary" style="margin-top: 14px; width: 100%;" onclick="runInference()">
+          <span>Reconstruct Route & Evaluate</span>
+        </button>
+      </div>
+
+      <div>
+        <div class="section-title">Evaluation Metrics</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">HMM Top-1 Accuracy</span>
+            <span class="stat-value success" id="statAccuracy">--%</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Route Continuity</span>
+            <span class="stat-value purple" id="statContinuity">--%</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">GPS Observations</span>
+            <span class="stat-value" id="statObs">--</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Pipeline Latency</span>
+            <span class="stat-value" id="statLatency">-- s</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Execution Timings</div>
+        <div class="timing-card" id="timingDetails">
+          <div class="timing-row"><span>Candidate Generation:</span><strong id="timeCand">-- ms</strong></div>
+          <div class="timing-row"><span>Feature Extraction:</span><strong id="timeFeat">-- ms</strong></div>
+          <div class="timing-row"><span>Model Scoring:</span><strong id="timeModel">-- ms</strong></div>
+          <div class="timing-row"><span>HMM / Viterbi:</span><strong id="timeHmm">-- ms</strong></div>
+        </div>
+      </div>
+
+      <div style="flex: 1; display: flex; flex-direction: column;">
+        <div class="section-title">API Communication Log</div>
+        <div class="terminal-container" id="terminalLog">Ready. Select trip and click Reconstruct.</div>
+      </div>
+    </aside>
+
+    <div class="map-container">
+      <div class="map-overlay-placeholder" id="placeholder">
+        <h3>Interactive Folium Map View</h3>
+        <p style="margin-top: 6px;">Select a trip and trigger route reconstruction to view geographical trajectory.</p>
+      </div>
+      <iframe id="mapFrame" src="about:blank" style="display: none;"></iframe>
+    </div>
+  </main>
+
+  <script>
+    // Set default API endpoint to current origin or localhost
+    const defaultEndpoint = window.location.origin.includes("http") ? window.location.origin : "http://localhost:8000";
+    document.getElementById("apiEndpoint").value = defaultEndpoint;
+
+    function log(msg) {
+      const term = document.getElementById("terminalLog");
+      const ts = new Date().toLocaleTimeString();
+      term.innerText += `\n[${ts}] ${msg}`;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    async function checkDeviceStatus() {
+      const base = document.getElementById("apiEndpoint").value.trim().replace(/\/$/, "");
+      try {
+        const res = await fetch(`${base}/api/devices`);
+        if (res.ok) {
+          const d = await res.json();
+          const badge = document.getElementById("deviceBadge");
+          badge.innerText = `Devices: ${d.active_count}/${d.limit} Active`;
+          badge.title = `Active device IPs:\n${d.devices.join("\n")}`;
+          badge.style.background = d.active_count >= d.limit ? "#b91c1c" : "#0284c7";
+        }
+      } catch (e) {
+        // Silently ignore device ping failure
+      }
+    }
+
+    async function pingApi() {
+      const base = document.getElementById("apiEndpoint").value.trim().replace(/\/$/, "");
+      log(`Pinging API at ${base}/health...`);
+      try {
+        const res = await fetch(`${base}/health`);
+        const data = await res.json();
+        log(`API Response: ${JSON.stringify(data)}`);
+        checkDeviceStatus();
+      } catch (err) {
+        log(`API Error: ${err.message}`);
+      }
+    }
+
+    async function fetchTrips() {
+      const base = document.getElementById("apiEndpoint").value.trim().replace(/\/$/, "");
+      const part = document.getElementById("partitionSelect").value;
+      log(`Fetching trips for partition '${part}'...`);
+      try {
+        const res = await fetch(`${base}/api/trips?partition=${part}`);
+        const data = await res.json();
+        const sel = document.getElementById("tripSelect");
+        sel.innerHTML = "";
+        data.trips.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.innerText = `Trip ${t}`;
+          sel.appendChild(opt);
+        });
+        log(`Loaded ${data.trips.length} trips successfully.`);
+        checkDeviceStatus();
+      } catch (err) {
+        log(`Error fetching trips: ${err.message}`);
+      }
+    }
+
+    async function runInference() {
+      const base = document.getElementById("apiEndpoint").value.trim().replace(/\/$/, "");
+      const tripId = document.getElementById("tripSelect").value;
+      const part = document.getElementById("partitionSelect").value;
+      const btn = document.getElementById("runBtn");
+
+      btn.disabled = true;
+      btn.innerText = "Processing Trip...";
+      log(`Sending POST /api/predict for Trip ${tripId}...`);
+
+      try {
+        const res = await fetch(`${base}/api/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trip_id: tripId, partition: part })
+        });
+
+        if (!res.ok) {
+          let errMsg = `HTTP ${res.status}`;
+          try {
+            const errData = await res.json();
+            errMsg = errData.detail || errMsg;
+          } catch (e) {
+            const errText = await res.text();
+            if (errText) errMsg = errText.slice(0, 200);
+          }
+          throw new Error(errMsg);
+        }
+
+        const data = await res.json();
+        log(`Prediction response received in ${data.pipeline_timing.total_seconds}s!`);
+
+        // Update KPIs
+        const metrics = data.evaluation_metrics;
+        document.getElementById("statAccuracy").innerText = metrics.hmm_accuracy_pct ? `${metrics.hmm_accuracy_pct}%` : "N/A";
+        document.getElementById("statContinuity").innerText = metrics.hmm_continuity_pct ? `${metrics.hmm_continuity_pct}%` : "N/A";
+        document.getElementById("statObs").innerText = data.observations_count.toLocaleString();
+        document.getElementById("statLatency").innerText = `${data.pipeline_timing.total_seconds} s`;
+
+        // Update Timings
+        const timing = data.pipeline_timing;
+        document.getElementById("timeCand").innerText = `${(timing.candidate_generation_s * 1000).toFixed(1)} ms`;
+        document.getElementById("timeFeat").innerText = `${(timing.feature_extraction_s * 1000).toFixed(1)} ms`;
+        document.getElementById("timeModel").innerText = `${(timing.model_scoring_s * 1000).toFixed(1)} ms`;
+        document.getElementById("timeHmm").innerText = `${(timing.hmm_viterbi_decoding_s * 1000).toFixed(1)} ms`;
+
+        // Update Map Frame with cache busting
+        const mapUrl = `${base}${data.map_url}&_t=${Date.now()}`;
+        const frame = document.getElementById("mapFrame");
+        frame.src = mapUrl;
+        frame.style.display = "block";
+        document.getElementById("placeholder").style.display = "none";
+        log(`Loaded interactive map from ${mapUrl}`);
+
+        checkDeviceStatus();
+
+      } catch (err) {
+        log(`Prediction Failed: ${err.message}`);
+        alert(`Inference failed: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Reconstruct Route & Evaluate";
+      }
+    }
+
+    // Initial device check
+    window.addEventListener("DOMContentLoaded", () => {
+      checkDeviceStatus();
+      setInterval(checkDeviceStatus, 10000);
+    });
+
+    const plotMap = {
+      infographic: { url: "/api/plots/06_master_comparison_infographic.png", desc: "Master Benchmark Infographic: Unified 6-panel summary dashboard synthesizing the entire benchmark." },
+      overall: { url: "/api/plots/01_overall_model_comparison.png", desc: "Overall Model Performance: CV Macro F1, Test Macro F1, Top-1 Accuracy, Log Loss, and ROC-AUC across 6 models." },
+      continuity: { url: "/api/plots/02_accuracy_and_continuity_by_trip.png", desc: "Per-Trip Accuracy & Continuity: Raw Classifier vs HMM/Viterbi sequence decoding (+7.65% continuity gain)." },
+      pareto: { url: "/api/plots/03_latency_vs_accuracy_tradeoff.png", desc: "Inference Latency vs Accuracy: Pareto efficiency curve showing ms/1k query latency against Macro F1." },
+      roc: { url: "/api/plots/04_roc_curves_all_models.png", desc: "ROC Curves: Receiver Operating Characteristic curves comparing discriminatory power across all models." },
+      tuning: { url: "/api/plots/05_bayesian_optimization_trials.png", desc: "Bayesian Optimization: 15 Optuna TPE trials showing objective convergence and depth sensitivity." }
+    };
+
+    function openModal() {
+      document.getElementById("compModal").style.display = "flex";
+      showTab("infographic");
+    }
+
+    function closeModal() {
+      document.getElementById("compModal").style.display = "none";
+    }
+
+    window.addEventListener("click", (e) => {
+      const m = document.getElementById("compModal");
+      if (e.target === m) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    function showTab(tabId) {
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+      if (event && event.target && event.target.classList) {
+        event.target.classList.add("active");
+      }
+
+      const tableEl = document.getElementById("tab-table");
+      const imgCont = document.getElementById("tab-image-container");
+      const base = document.getElementById("apiEndpoint").value.trim().replace(/\/$/, "");
+
+      if (tabId === "table") {
+        tableEl.style.display = "block";
+        imgCont.style.display = "none";
+      } else {
+        tableEl.style.display = "none";
+        imgCont.style.display = "block";
+        const info = plotMap[tabId];
+        if (info) {
+          document.getElementById("modalPlotImg").src = `${base}${info.url}`;
+          document.getElementById("modalPlotDesc").innerText = info.desc;
+        }
+      }
+    }
+
+    // Auto-fetch available trips on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      fetchTrips();
+    });
+  </script>
+
+  <!-- Model Comparison Modal -->
+  <div id="compModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 PathSnap Multi-Model Benchmark & Visual Analytics</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-nav">
+          <button class="nav-btn active" onclick="showTab('infographic')">🌟 Master Dashboard</button>
+          <button class="nav-btn" onclick="showTab('table')">📋 Benchmark Table</button>
+          <button class="nav-btn" onclick="showTab('overall')">📊 Macro F1 & Accuracy</button>
+          <button class="nav-btn" onclick="showTab('continuity')">🚗 HMM vs Classifier</button>
+          <button class="nav-btn" onclick="showTab('pareto')">⚡ Latency vs Accuracy</button>
+          <button class="nav-btn" onclick="showTab('roc')">🎯 ROC Curves</button>
+          <button class="nav-btn" onclick="showTab('tuning')">🔬 Bayesian Tuning</button>
+        </div>
+
+        <!-- Tab: Table -->
+        <div id="tab-table" style="display:none;">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Algorithm Family</th>
+                <th>Top-1 Acc</th>
+                <th>CV Macro F1</th>
+                <th>Test Macro F1</th>
+                <th>Log Loss</th>
+                <th>ROC-AUC</th>
+                <th>Latency (ms/1k)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: rgba(16, 185, 129, 0.15); font-weight: bold;">
+                <td style="color:#34d399;">Random Forest (Tuned) ★</td>
+                <td>Ensemble (Bagging)</td>
+                <td>82.70%</td>
+                <td style="color:#34d399;">0.8953</td>
+                <td>0.8845</td>
+                <td>0.1168</td>
+                <td>0.9852</td>
+                <td>1.72 ms</td>
+              </tr>
+              <tr>
+                <td>Multi-Layer Perceptron</td>
+                <td>Neural Network</td>
+                <td>80.79%</td>
+                <td>0.8815</td>
+                <td>0.8808</td>
+                <td>0.1105</td>
+                <td>0.9797</td>
+                <td>1.05 ms</td>
+              </tr>
+              <tr>
+                <td>Random Forest (Default)</td>
+                <td>Ensemble (Bagging)</td>
+                <td>81.03%</td>
+                <td>0.8734</td>
+                <td>0.8783</td>
+                <td>0.1376</td>
+                <td>0.9815</td>
+                <td>2.58 ms</td>
+              </tr>
+              <tr>
+                <td>HistGradientBoosting</td>
+                <td>Boosting (Tree-based)</td>
+                <td>80.86%</td>
+                <td>0.8509</td>
+                <td>0.8656</td>
+                <td>0.1561</td>
+                <td>0.9816</td>
+                <td>2.93 ms</td>
+              </tr>
+              <tr>
+                <td>K-Nearest Neighbors</td>
+                <td>Instance-based</td>
+                <td>79.42%</td>
+                <td>0.8695</td>
+                <td>0.8755</td>
+                <td>0.2522</td>
+                <td>0.9435</td>
+                <td style="color:#f87171;">140.70 ms (Slow)</td>
+              </tr>
+              <tr>
+                <td>Logistic Regression</td>
+                <td>Linear & Probabilistic</td>
+                <td>79.04%</td>
+                <td>0.7889</td>
+                <td>0.7913</td>
+                <td>0.2211</td>
+                <td>0.9731</td>
+                <td>0.26 ms</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px; color:#94a3b8;">* Cross-validation performed using 5-fold GroupKFold partitioned strictly by <code>trip_id</code> on 80 training trips (zero data leakage).</p>
+        </div>
+
+        <!-- Tab: Image Viewer -->
+        <div id="tab-image-container" class="plot-display-container">
+          <img id="modalPlotImg" src="/api/plots/06_master_comparison_infographic.png" alt="Model Comparison Plot" />
+          <div id="modalPlotDesc" style="margin-top:10px; font-size:13px; color:#cbd5e1; font-weight:600;">
+            Master Benchmark Infographic: Unified 6-panel summary dashboard synthesizing the entire benchmark.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "dataset_partition": "evaluator_test",
+  "trips_evaluated": 10,
+  "model_artifact": "artifacts\\models\\random_forest_tuned.joblib",
+  "scaler_artifact": "artifacts\\models\\scaler.joblib",
+  "model_sha256_verified": "4d4c49efac99aa6b59d57077d82cd19a3aee97bc1856467b70d5dc4631762abe",
+  "scaler_sha256_verified": "aa74b1c5d88fe7a68e9e6e7e6cc36457791f4db5e07040d45accb77d22abf0b5",
+  "artifacts_unmodified": true,
+  "macro_average_metrics": {
+    "mean_classifier_accuracy": 0.8145,
+    "mean_hmm_accuracy": 0.8631,
+    "mean_accuracy_improvement_pct": 4.86,
+    "mean_classifier_continuity": 0.892,
+    "mean_hmm_continuity": 0.9582,
+    "mean_continuity_improvement_pct": 6.62,
+    "mean_candidate_miss_rate_pct": 0.001,
+    "mean_pipeline_latency_s": 1.756,
+    "mean_inference_time_s": 0.088,
+    "mean_hmm_decoding_time_s": 0.34
+  },
+  "observation_weighted_metrics": {
+    "total_observations": 19674,
+    "total_transitions": 19664,
+    "weighted_classifier_accuracy": 0.7264,
+    "weighted_hmm_accuracy": 0.7858,
+    "weighted_accuracy_improvement_pct": 5.93,
+    "weighted_classifier_continuity": 0.9021,
+    "weighted_hmm_continuity": 0.9717,
+    "weighted_continuity_improvement_pct": 6.96,
+    "total_candidate_misses": 1,
+    "overall_candidate_miss_rate_pct": 0.0051
+  },
+  "execution_date": "2026-11-18 17:09:56"
+}

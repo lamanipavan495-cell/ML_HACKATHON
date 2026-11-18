@@ -1,0 +1,9 @@
+{
+  "mean_classifier_accuracy": 0.827,
+  "mean_hmm_accuracy": 0.8771,
+  "mean_classifier_continuity": 0.8941,
+  "mean_hmm_continuity": 0.9729,
+  "mean_continuity_gain_pct": 7.88,
+  "total_test_observations": 19160,
+  "trips_evaluated": 10
+}
